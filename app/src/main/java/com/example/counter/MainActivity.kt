@@ -2,49 +2,44 @@ package com.example.counter
 
 import android.os.Bundle
 import android.widget.Toast
-import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.Observer
 import com.example.counter.databinding.ActivityMainBinding
 
-class MainActivity : AppCompatActivity(),CounterView {
+class MainActivity : AppCompatActivity() {
 
     private val binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
-
-    private val presenter = CounterPresenter()
+    private val viewModel: CounterViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
-        presenter.attachView(this)
+        setUpObservers()
         setUpListeners()
+    }
+
+    private fun setUpObservers() {
+        viewModel.count.observe(this, Observer { count ->
+            binding.tvResult.text = count.toString()
+        })
+
+        viewModel.toastMessage.observe(this, Observer { message ->
+            Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+        })
+
+        viewModel.textColor.observe(this, Observer { colorRes ->
+            binding.tvResult.setTextColor(getColor(colorRes))
+        })
     }
 
     private fun setUpListeners() = with(binding) {
         btnDecrement.setOnClickListener {
-            presenter.onDecrement()
+            viewModel.decrement()
         }
 
         btnIncrement.setOnClickListener {
-            presenter.onIncrement()
+            viewModel.increment()
         }
-    }
-
-    override fun showResult(count: Int) {
-        binding.tvResult.text = count.toString()
-    }
-
-    override fun showToast(msg: String) {
-        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
-    }
-
-    override fun tvColorGreen() {
-        binding.tvResult.setTextColor(this.getColor(R.color.green))
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        presenter.detachView()
     }
 }

@@ -1,15 +1,15 @@
 package com.example.counter
 
 class CounterModel {
-
     private var count = 0
 
-    fun increment(){
+    fun increment() {
         count++
     }
-    fun decrement(){
+
+    fun decrement() {
         count--
     }
 
-    fun getCount()= count
+    fun getCount() = count
 }
